@@ -1,0 +1,26 @@
+{
+  "name": "github-trend-automation",
+  "version": "0.0.1",
+  "description": "automation for gihub-trend-kr",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/TeamSEGO/github-trend-automation.git"
+  },
+  "keywords": [
+    "github",
+    "trend"
+  ],
+  "author": "keen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TeamSEGO/github-trend-automation/issues"
+  },
+  "homepage": "https://github.com/TeamSEGO/github-trend-automation",
+  "dependencies": {
+    "nodegit": "^0.2.7"
+  }
+}
