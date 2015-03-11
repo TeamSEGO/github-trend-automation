@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/TeamSEGO/github-trend-automation",
   "dependencies": {
-    "concat-files": "^0.1.0",
-    "nodegit": "^0.2.7"
+    "async": "^0.9.0",
+    "progress": "^1.1.8"
   }
 }
