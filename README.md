@@ -1,6 +1,7 @@
 # github-trend-automation
 1. 깃든샘으로 포팅
-2. 깃헙페이지 publish
+2. 깃헙으로 페이지 publish
+3. email 템플릿 만들기
 3. 그 외 ㅈㄴ 귀찮은 일들은 여기에
 
 
