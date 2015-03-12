@@ -40,18 +40,20 @@ var cloneFromGithub = function( weeklyName, callback ){
       if(err)console.log(err);
       console.log( mFiles );
       weeklyReadmeGHPath = weeklyName + "-README.md";
-      fs.readFile( tempGHPath + "/" + weeklyName + "/README.md" , function (err, data) {
+      fs.readFile( tempGHPath + "/" + weeklyName + "/README.md" ,
+        function (err, data) {
         fs.writeFileSync( weeklyReadmeGHPath , data );
         fs.appendFileSync( weeklyReadmeGHPath, newLine );
         async.eachSeries(mFiles, function(mfile, cb){
           if(mfile == "README.md"){
             cb();
           }else{
-            fs.readFile( tempGHPath + "/" + weeklyName + "/" +mfile , function (err, data) {
-              if (err) throw err;
-              fs.appendFileSync(weeklyReadmeGHPath, data );
-              fs.appendFileSync(weeklyReadmeGHPath, newLine );
-              cb();
+            fs.readFile( tempGHPath + "/" + weeklyName + "/" +mfile ,
+              function (err, data) {
+                if (err) throw err;
+                fs.appendFileSync(weeklyReadmeGHPath, data );
+                fs.appendFileSync(weeklyReadmeGHPath, newLine );
+                cb();
             });
           }
         }, callback );
@@ -77,23 +79,49 @@ var cloneFromGitnSam = function( weeklyName, callback ){
 }
 
 var pushToGitnsam = function( weeklyName, callback ){
+  console.log("push start");
   var num = (parseInt(weeklyName.substr(0,3))-1);
   num = num<10?"00"+num:(num<100?"0"+num:num);
   var backupName = num + "-backup.md";
+  console.log(backupName);
   //image copy
-  ncp( tempGHPath + "/img", tempGSPath + "/img", function (err) {
-   if (err) {return console.error(err);}
-   //replace file
-   fs.rename(tempGSPath + "/README.md",tempGSPath +"/" +backupName,  function(){
+  ncp( tempGHPath + "/img", tempGSPath + "/img", {clobber:true},function (err) {
+    console.log("img copied");
+    if (err) {return console.error(err);}
+    //replace file
+    fs.rename(tempGSPath + "/README.md",tempGSPath +"/" +backupName,  function(){
+     console.log("README renamed");
      //file replace img-->raw/master..
      modifyREADMEmd( weeklyName+"-README.md", function(){
+       console.log("img path chaged");
        //copy README
        fs.createReadStream(weeklyName+"-README.md").pipe(fs.createWriteStream( tempGSPath + '/README.md'));
-
        //git push
+       exec("git add -A",
+            { cwd: __dirname+"/gitnsam_tmp"},
+              function(error, stdout, stderr){
+         console.log("git add");
+         if(error)console.log(error);
+         if(stdout)console.log(stdout);
+         if(stderr)console.log(stderr);
+         exec("git commit -m \""+weeklyName+" automation sumpup\"",
+              { cwd: __dirname+"/gitnsam_tmp"},
+              function(error, stdout, stderr){
+           if(error)console.log(error);
+           if(stdout)console.log(stdout);
+           if(stderr)console.log(stderr);
+           exec("git push origin master",
+                { cwd: __dirname+"/gitnsam_tmp"},
+                function(error, stdout, stderr){
+             if(error)console.log(error);
+             if(stdout)console.log(stdout);
+             if(stderr)console.log(stderr);
+           });
+         });
+       });
      });
    })
-  });
+ });
 }
 var modifyREADMEmd = function( fileName , callback){
   //( ../img-->../raw/master/img )
@@ -120,23 +148,28 @@ var sendMessageToCellWe = function(){
 
 }
 var main = function( command, weeklyName ){
+  console.log("you selected '" + command+"' and '"+ weeklyName+"'");
   var callback = function(){ console.log("done"); }
   if( command == "gh-down" ){
     cloneFromGithub( weeklyName, callback );
   }else if( command == "gs-down" ){
     cloneFromGitnSam( null, callback );
   }else if( command == "mv-push" ){
-    pushToGitnsam(process.argv[3], callback);
+    pushToGitnsam(weeklyName, callback);
   }else if( command == "modifyMD" ){
-    modifyREADMEmd(process.argv[3], callback);
+    modifyREADMEmd(weeklyName, callback);
   }else if( command == "all" ){
-
+    cloneFromGithub( weeklyName, function(){
+      cloneFromGitnSam(null, function(){
+          pushToGitnsam(weeklyName, callback);
+      })
+    } );
   }
 }
 
 if( process.argv[2] == null || process.argv[3] == null){
   console.log("parameter 를 빠트리셨네요. \n\r"
-              +"usage : node git-job ( gh-down, gs-down, mv-push, modifyMD, all ) github_dir gitnsam_message");
+              +"usage : node git-job ( gh-down, gs-down, mv-push, modifyMD, all ) github_dir");
 }else{
   main(process.argv[2], process.argv[3]);
 }

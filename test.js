@@ -9,10 +9,8 @@ var temp = "Hello ../img, would you like some ../img";
 temp = temp.replace(/..\/img/g,"../asdf/sadf");
 temp = temp.replace("%DRINK%","tea");
 console.log(temp);
-exec("cd gitnsam_tmp;git status;", function(error, stdout, stderr){
-  console.log(stdout);
-  exec("git status", function(error, stdout, stderr){
-    console.log(stdout);
+console.log(__dirname);
+exec("git status", { cwd: __dirname+"/gitnsam_tmp"},function(error, stdout, stderr){
+  console.log(error,stdout,stderr);
 
-  })
 } );
