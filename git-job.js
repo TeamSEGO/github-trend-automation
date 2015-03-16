@@ -129,7 +129,7 @@ var modifyREADMEmd = function( fileName , callback){
     if (err) {
       return console.log(err);
     }
-    var result = data.replace(/..\/img/g,"../raw/master/img");
+    var result = data.replace(/..\/img/g,"../../raw/master/img");
     fs.writeFile("temp_" + fileName, result, 'utf8', function (err) {
        if (err) return console.log(err);
        fs.unlink(fileName, function(err){
